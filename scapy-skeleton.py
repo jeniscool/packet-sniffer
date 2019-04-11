@@ -39,7 +39,7 @@ class IP:
 
 
 # ****** TCP header: sport, dport, seq, ack, dataofs, reserved, flags, window, chksum, urgptr, options ******
-# Used for reliable connections•
+# Used for reliable connections
 # Checks for: lost packets, transmission errors, packets out of order and so on....
 # examples: emails, sms, internet browsing
 # Transportation Layer
@@ -79,7 +79,7 @@ class UDP:
 
 
 # **********************************
-# Function to pull data from packets
+# Function to pull data from packets and put in a dictionary
 # **********************************
 def fields_extraction(packet):
 
@@ -97,8 +97,9 @@ def fields_extraction(packet):
     # use packet.time for time information on the pkts
     packet.show()
 
+
 # **********************************
-# Function to find flows
+# Function to find flows and place them in a dictionary
 # **********************************
 def find_flows():
     # for all packets found, group them into flows
@@ -118,7 +119,7 @@ def find_flows():
                 flows[ID] = [packet]
 
     # ****** DELETE LATER ******
-    print(f'Number of flows: {len(flows)}')
+    #print(f"Number of flows: {len(flows)}")
 
 # **********************************
 # Function to fill csv with packet data
@@ -131,6 +132,24 @@ def find_flows():
 
 
 # *********************************
+# Function to extract data from flows into csv
+# *********************************
+def extract_data():
+    csv_file = 'test.csv'
+    with open(csv_file, 'w') as p:
+        p.write(str('num packets, proto\n'))
+        for key in flows.keys():
+            flow_size = len(flows[key])
+            if flows[key][0][1].proto == 'TCP':
+                protocol = 1
+            else:
+                protocol = 0
+            writer = csv.writer(p, delimiter=',')
+            writer.writerows(zip("%.2f" % flow_size, "%d" % protocol))
+            # p.write(str(flowSize))
+
+
+# *********************************
 # Main function!
 # *********************************
 def main():
@@ -140,16 +159,18 @@ def main():
 
     # Step 2: Extract the interested value from each packet of the flow
     # and calculate a statistical measure (max, min, avg, std_dev...)
-
+    extract_data()
+    # Things to include
+    # time, number of packets in flow, tcp(1)/udp(0), average packet length
 
 
 # *********************************
 # Global Variables
 # ********************************
 cPackets = Counter() # packet counter
-c = 50 # variable for amount of packets to collect
+c = 1000 # variable for amount of packets to collect
 # packets = sniff(prn=fields_extraction, count=c) # sniffed packets
-packets = sniff(count = c)
+packets = sniff(count=c)
 # might need numpy arrays to hold features in classes
 flows = {}  # dictionary to hold flows
 
@@ -157,3 +178,5 @@ flows = {}  # dictionary to hold flows
 # Begin Program!
 # *****************
 main()
+
+#print(flows.values())
