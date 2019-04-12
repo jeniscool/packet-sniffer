@@ -8,127 +8,38 @@ import numpy as np
 from collections import Counter
 import csv
 
-# **********************************
-# Classes to store packet data - don't delete yet
-# **********************************
-#   - Ethernet header: dst, src, type;
-class Ethernet:
-
-    def __init__(self, dst, src, p_type):
-        self.dst = dst
-        self.src = src
-        self.p_type = p_type
-
-
-#   - IP header: version, ihl, tos, len, if, flags, frag, ttl, proto, chksum, src, dest;
-class IP:
-
-    def __init__(self, v, ihl, tos, len, id, flags, frag, ttl, proto, chksum, src, dest):
-        self.v = v
-        self.ihl = ihl
-        self.tos = tos
-        self.len = len # average size of exchanged packets??
-        self.id = id
-        self.flags = flags
-        self.frag = frag
-        self.ttl = ttl
-        self.proto = proto
-        self.chksum = chksum
-        self.src = src
-        self.dest = dest
-
-
-# ****** TCP header: sport, dport, seq, ack, dataofs, reserved, flags, window, chksum, urgptr, options ******
-# Used for reliable connections
-# Checks for: lost packets, transmission errors, packets out of order and so on....
-# examples: emails, sms, internet browsing
-# Transportation Layer
-# ****************************************
-class TCP:
-
-    def __init__(self, sport, dport, seq, ack, dataofs, reserved, flags, window, chksum, urgptr, options):
-        self.sport = sport
-        self.dport = dport
-        self.seq = seq
-        self.ack = ack
-        self.dataofs = dataofs
-        self.reserved = reserved
-        self.flags = flags
-        self.window = window
-        self.chksum = chksum
-        self.urgptr = urgptr
-        self.options = options
-
-
-# ****** UDP header: sport, dport, len, chksum ******
-# Used for unreliable connections with no sessions
-# Does not check for error checking or flow control
-# Sends packets and forgets
-# examples:voice over IP, video streaming
-# Transportation Layer
-# ***************************************************
-class UDP:
-
-    def __init__(self, sport, dport, len, chksum):
-        self.sport = sport
-        self.dport = dport
-        self.len = len
-        self.chksum = chksum
-
-#   - Occasionally some other protocol might show up, such as ARP, which is a transport layer protocol.
-
-
-# **********************************
-# Function to pull data from packets and put in a dictionary
-# **********************************
-def fields_extraction(packet):
-
-    # Fill classes
-    # pEther[sum(cPackets.values())] = Ethernet(packet[0][0].dst, packet[0][0].src, hex(packet[0][0].type))
-    # pIP[sum(cPackets.values())] = IP(packet[0][1].version, packet[0][1].ihl, packet[0][1].tos, packet[0][1].len,
-    #                                 packet[0][1].id, packet[0][1].flags, packet[0][1].frag, packet[0][1].ttl,
-    #                                 packet[0][1].proto, packet[0][1].chksum, packet[0][1].src, packet[0][1].dst)
-    #
-    # pTCP[sum(cPackets.values())] = TCP(packet[0][2].sport, packet[0][2].dport, packet[0][2].seq, packet[0][2].ack,
-    #                                   packet[0][2].dataofs, packet[0][2].reserved, packet[0][2].flags,
-    #                                   packet[0][2].window, packet[0][2].chksum, packet[0][2].urgptr,
-    #                                   packet[0][2].options)
-
-    # use packet.time for time information on the pkts
-    packet.show()
-
 
 # **********************************
 # Function to find flows and place them in a dictionary
 # **********************************
 def find_flows():
-    # for all packets found, group them into flows
     for packet in packets:
-        # a flow is a tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
-        # assign to each flow an ID, which is shared among all packets of that flow.
-        ID = (packet[0][1].src, packet[0][2].sport, packet[0][1].dst, packet[0][2].dport, packet[0][1].proto)
+        # collect flow info for packet
+        ip_src = packet.sprintf('%IP.src%')
+        ip_dst = packet.sprintf('%IP.dst%')
+        ip_proto = packet.sprintf('%IP.proto%')
+        # check packet protocol
+        if ip_proto == 'tcp':
+            sport = packet.sprintf('%TCP.sport%')
+            dport = packet.sprintf('%TCP.dport%')
+        elif ip_proto == 'udp':
+            sport = packet.sprintf('%UDP.sport%')
+            dport = packet.sprintf('%UDP.dport%')
+        else:
+            continue
 
-        if ID in flows:  # append packet to flow, if already exists
-            flows[ID].append(packet)
+        # create id for this packet's flow
+        flow_id = (ip_src, ip_dst, ip_proto, sport, dport)
+
+        # add flow to dictionary of flows
+        if flow_id in flows:
+            flows[flow_id].append(packet)
         else:  # else check for bi-directional flows
-            # represents the bi-directional flow
-            bi_ID = (packet[0][1].dst, packet[0][2].dport, packet[0][1].src, packet[0][2].sport, packet[0][1].proto)
-            if bi_ID in flows:  # if that's in the packet, append
-                flows[bi_ID].append(packet)
+            bi_id = (ip_dst, ip_src, ip_proto, dport, sport)
+            if bi_id in flows:
+                flows[bi_id].append(packet)
             else:  # if not, create a new flow in dictionary
-                flows[ID] = [packet]
-
-    # ****** DELETE LATER ******
-    #print(f"Number of flows: {len(flows)}")
-
-# **********************************
-# Function to fill csv with packet data
-# **********************************
-# def fill_csv():
-#    with open('packet-data.csv', mode='w') as csvfile:
-        # print("hi")
-        # pd-writer = csv.writer(pd, deliminator = ',', quotechar = '"')
-#        fieldNames = ['flow_id', 'feature_1', 'feature_2', 'feature_3', 'feature_4', 'label']
+                flows[flow_id] = [packet]
 
 
 # *********************************
@@ -137,46 +48,84 @@ def find_flows():
 def extract_data():
     csv_file = 'test.csv'
     with open(csv_file, 'w') as p:
-        p.write(str('num packets, proto\n'))
+        # write csv headers
+        p.write(str('num packets, proto, sport, dport, avg packet size\n'))
+
+        # for each flow
         for key in flows.keys():
+            # finds number of packets in each flow
             flow_size = len(flows[key])
-            if flows[key][0][1].proto == 'TCP':
+
+            # find protocol and ports for each flow
+            temp_proto = flows[key][0].sprintf('%IP.proto%')
+            if temp_proto == 'tcp':
                 protocol = 1
-            else:
+                if flows[key][0].sprintf('%TCP.sport%') == 'https':
+                    flow_sport = 443
+                elif flows[key][0].sprintf('%TCP.sport%') == 'domain':
+                    flow_sport = 53
+                elif flows[key][0].sprintf('%TCP.sport%') == 'http':
+                    flow_sport = 80
+                elif flows[key][0].sprintf('%TCP.sport%') == 'mdns':
+                    flow_sport = 5353
+                else:
+                    flow_sport = int(flows[key][0].sprintf('%TCP.sport%'))
+                if flows[key][0].sprintf('%TCP.dport%') == 'https':
+                    flow_dport = 443
+                elif flows[key][0].sprintf('%TCP.dport%') == 'domain':
+                    flow_dport = 53
+                elif flows[key][0].sprintf('%TCP.dport%') == 'http':
+                    flow_dport = 80
+                elif flows[key][0].sprintf('%TCP.dport%') == 'mdns':
+                    flow_dport = 5353
+                else:
+                    flow_dport = int(flows[key][0].sprintf('%TCP.dport%'))
+            elif temp_proto == 'udp':
                 protocol = 0
-            writer = csv.writer(p, delimiter=',')
-            writer.writerows(zip("%.2f" % flow_size, "%d" % protocol))
-            # p.write(str(flowSize))
+                if flows[key][0].sprintf('%UDP.sport%') == 'https':
+                    flow_sport = 443
+                elif flows[key][0].sprintf('%UDP.sport%') == 'domain':
+                    flow_sport = 53
+                elif flows[key][0].sprintf('%UDP.sport%') == 'http':
+                    flow_sport = 80
+                elif flows[key][0].sprintf('%UDP.sport%') == 'mdns':
+                    flow_sport = 5353
+                else:
+                    flow_sport = int(flows[key][0].sprintf('%UDP.sport%'))
+                if flows[key][0].sprintf('%UDP.dport%') == 'https':
+                    flow_dport = 443
+                elif flows[key][0].sprintf('%UDP.dport%') == 'domain':
+                    flow_dport = 53
+                elif flows[key][0].sprintf('%UDP.dport%') == 'http':
+                    flow_dport = 80
+                elif flows[key][0].sprintf('%UDP.dport%') == 'mdns':
+                    flow_dport = 5353
+                else:
+                    flow_dport = int(flows[key][0].sprintf('%UDP.dport%'))
+
+            # find avg packet size
+            total_packet_size = 0
+            for packet in flows[key]:
+                total_packet_size += int(packet.sprintf('%IP.len%'))
+            avg_packet_size = total_packet_size/flow_size
+
+            # output flow data to csv file
+            csv_row = '%d, %d, %d, %d, %d\n' % (flow_size, protocol, flow_sport, flow_dport, avg_packet_size)
+            p.write(csv_row)
 
 
 # *********************************
-# Main function!
-# *********************************
-def main():
-    # Step 1: Extract all packets that belong to the same flow
-    # tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
-    find_flows()
-
-    # Step 2: Extract the interested value from each packet of the flow
-    # and calculate a statistical measure (max, min, avg, std_dev...)
-    extract_data()
-    # Things to include
-    # time, number of packets in flow, tcp(1)/udp(0), average packet length
-
-
-# *********************************
-# Global Variables
+# Start Program!
 # ********************************
-cPackets = Counter() # packet counter
-c = 1000 # variable for amount of packets to collect
-# packets = sniff(prn=fields_extraction, count=c) # sniffed packets
-packets = sniff(count=c)
-# might need numpy arrays to hold features in classes
+c = 1000  # variable for amount of packets to collect
 flows = {}  # dictionary to hold flows
 
-# *****************
-# Begin Program!
-# *****************
-main()
+packets = sniff(count=c)
 
-#print(flows.values())
+# Step 1: Extract all packets that belong to the same flow
+# tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
+find_flows()
+
+# Step 2: Extract the interested value from each packet of the flow
+# and calculate a statistical measure (max, min, avg, std_dev...)
+extract_data()
