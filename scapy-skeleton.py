@@ -106,6 +106,7 @@ def find_flows():
     for packet in packets:
         # a flow is a tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
         # assign to each flow an ID, which is shared among all packets of that flow.
+        # if hasattr(packet.payload, "src") and hasattr(packet.payload, "proto"):
         ID = (packet[0][1].src, packet[0][2].sport, packet[0][1].dst, packet[0][2].dport, packet[0][1].proto)
 
         if ID in flows:  # append packet to flow, if already exists
@@ -118,18 +119,6 @@ def find_flows():
             else:  # if not, create a new flow in dictionary
                 flows[ID] = [packet]
 
-    # ****** DELETE LATER ******
-    #print(f"Number of flows: {len(flows)}")
-
-# **********************************
-# Function to fill csv with packet data
-# **********************************
-# def fill_csv():
-#    with open('packet-data.csv', mode='w') as csvfile:
-        # print("hi")
-        # pd-writer = csv.writer(pd, deliminator = ',', quotechar = '"')
-#        fieldNames = ['flow_id', 'feature_1', 'feature_2', 'feature_3', 'feature_4', 'label']
-
 
 # *********************************
 # Function to extract data from flows into csv
@@ -137,46 +126,53 @@ def find_flows():
 def extract_data():
     csv_file = 'test.csv'
     with open(csv_file, 'w') as p:
-        p.write(str('num packets, proto\n'))
+        # write csv headers
+        p.write(str('num packets, proto, avg packet size\n'))
+
+        # for each flow
         for key in flows.keys():
+            # finds number of packets in each flow
             flow_size = len(flows[key])
-            if flows[key][0][1].proto == 'TCP':
+            # flows[key][0].show()
+            print(" flow size: %d\n" % flow_size)
+            # finds average packet size
+            total_size = 0
+            for f in range(flow_size):
+                # print(flows[key][f].summary())
+                total_size = total_size + flows[key][f][1].len
+                print(" packet size is %f\n" % flows[key][f][1].len)
+                print("total size is %f\n" % total_size)
+            avg_packet_size = total_size/flow_size
+            print("avg packet size %f\n" % avg_packet_size)
+            # finds protocol for each flow
+            if flows[key][0][1].proto == 17:  # UDP = 17
                 protocol = 1
-            else:
+            elif flows[key][0][1].proto == 6:  # TCP = 6
                 protocol = 0
+            else:
+                protocol = 2
+
+            # write data to csv
             writer = csv.writer(p, delimiter=',')
-            writer.writerows(zip("%.2f" % flow_size, "%d" % protocol))
-            # p.write(str(flowSize))
+            writer.writerows(zip("%.2f" % flow_size, "%d" % protocol, "%.2f" % avg_packet_size))
 
 
 # *********************************
-# Main function!
-# *********************************
-def main():
-    # Step 1: Extract all packets that belong to the same flow
-    # tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
-    find_flows()
-
-    # Step 2: Extract the interested value from each packet of the flow
-    # and calculate a statistical measure (max, min, avg, std_dev...)
-    extract_data()
-    # Things to include
-    # time, number of packets in flow, tcp(1)/udp(0), average packet length
-
-
-# *********************************
-# Global Variables
+# Start Program!
 # ********************************
-cPackets = Counter() # packet counter
-c = 1000 # variable for amount of packets to collect
-# packets = sniff(prn=fields_extraction, count=c) # sniffed packets
+# Why do we need this counter?
+cPackets = Counter()  # packet counter
+c = 1000  # variable for amount of packets to collect
 packets = sniff(count=c)
 # might need numpy arrays to hold features in classes
 flows = {}  # dictionary to hold flows
 
-# *****************
-# Begin Program!
-# *****************
-main()
 
-#print(flows.values())
+# Step 1: Extract all packets that belong to the same flow
+# tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
+find_flows()
+# Step 2: Extract the interested value from each packet of the flow
+# and calculate a statistical measure (max, min, avg, std_dev...)
+# Things to include
+# time, number of packets in flow, tcp(1)/udp(0), average packet length
+extract_data()
