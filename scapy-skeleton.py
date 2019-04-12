@@ -5,13 +5,13 @@ from sys import *
 import socket 
 import os
 import numpy as np
-from collections import Counter
+from collections import OrderedDict
 import csv
 
 
-# **********************************
+# ******************************************************
 # Function to find flows and place them in a dictionary
-# **********************************
+# ******************************************************
 def find_flows():
     for packet in packets:
         # collect flow info for packet
@@ -41,15 +41,68 @@ def find_flows():
             else:  # if not, create a new flow in dictionary
                 flows[flow_id] = [packet]
 
+# ***********************************
+# Function to remove noise from data
+# ***********************************
+def remove_flows():
 
-# *********************************
+    # list of keys to be deleted
+    selectedkeys = []
+
+    for key in flows.keys():
+        # finds number of packets in each flow
+        flow_size = len(flows[key])
+        # if there's less that 10 flows delete
+        if flow_size > 10:
+            selectedkeys.append(key)
+
+    # delete selected keys from list of flows
+    for key in selectedkeys:
+        if key in flows.keys():
+            del flows[key]
+
+# *********************************************
+# Function to return the port # for a service
+# *********************************************
+def find_port_number(port):
+    if port == 'https':
+        return 443
+    elif port == 'domain':
+        return 53
+    elif port == 'http':
+        return 80
+    elif port == 'mdns':
+        return 5353
+    elif port == 'n2nremote':
+        return 1683
+    elif port == 'tivoconnect':
+        return 2190
+    elif port == 'cleanerliverc':
+        return 3481
+    elif port == 'plethora':
+        return 3480
+    elif port == 'ssdp':
+        return 1900
+    else:
+        if type(port) == int:
+            return port
+        else:
+            try:
+                return int(port)
+            except ValueError:
+                print(f'cant find {port}')
+                return 0
+
+# *********************************************
 # Function to extract data from flows into csv
-# *********************************
+# *********************************************
 def extract_data():
-    csv_file = 'test.csv'
-    with open(csv_file, 'w') as p:
+    csv_file = 'data.csv'
+    with open(csv_file, 'a') as p:
         # write csv headers
-        p.write(str('num packets, proto, sport, dport, avg packet size\n'))
+        #p.write(str('flow_id, IPsrc, IPdst, proto, time, num packets, sport, dport, avg_packet_size, label\n'))
+
+        flow_id = 0
 
         # for each flow
         for key in flows.keys():
@@ -60,48 +113,15 @@ def extract_data():
             temp_proto = flows[key][0].sprintf('%IP.proto%')
             if temp_proto == 'tcp':
                 protocol = 1
-                if flows[key][0].sprintf('%TCP.sport%') == 'https':
-                    flow_sport = 443
-                elif flows[key][0].sprintf('%TCP.sport%') == 'domain':
-                    flow_sport = 53
-                elif flows[key][0].sprintf('%TCP.sport%') == 'http':
-                    flow_sport = 80
-                elif flows[key][0].sprintf('%TCP.sport%') == 'mdns':
-                    flow_sport = 5353
-                else:
-                    flow_sport = int(flows[key][0].sprintf('%TCP.sport%'))
-                if flows[key][0].sprintf('%TCP.dport%') == 'https':
-                    flow_dport = 443
-                elif flows[key][0].sprintf('%TCP.dport%') == 'domain':
-                    flow_dport = 53
-                elif flows[key][0].sprintf('%TCP.dport%') == 'http':
-                    flow_dport = 80
-                elif flows[key][0].sprintf('%TCP.dport%') == 'mdns':
-                    flow_dport = 5353
-                else:
-                    flow_dport = int(flows[key][0].sprintf('%TCP.dport%'))
+
+                flow_sport = find_port_number(flows[key][0].sprintf('%TCP.sport%'))
+                flow_dport = find_port_number(flows[key][0].sprintf('%TCP.dport%'))
+
             elif temp_proto == 'udp':
                 protocol = 0
-                if flows[key][0].sprintf('%UDP.sport%') == 'https':
-                    flow_sport = 443
-                elif flows[key][0].sprintf('%UDP.sport%') == 'domain':
-                    flow_sport = 53
-                elif flows[key][0].sprintf('%UDP.sport%') == 'http':
-                    flow_sport = 80
-                elif flows[key][0].sprintf('%UDP.sport%') == 'mdns':
-                    flow_sport = 5353
-                else:
-                    flow_sport = int(flows[key][0].sprintf('%UDP.sport%'))
-                if flows[key][0].sprintf('%UDP.dport%') == 'https':
-                    flow_dport = 443
-                elif flows[key][0].sprintf('%UDP.dport%') == 'domain':
-                    flow_dport = 53
-                elif flows[key][0].sprintf('%UDP.dport%') == 'http':
-                    flow_dport = 80
-                elif flows[key][0].sprintf('%UDP.dport%') == 'mdns':
-                    flow_dport = 5353
-                else:
-                    flow_dport = int(flows[key][0].sprintf('%UDP.dport%'))
+
+                flow_sport = find_port_number(flows[key][0].sprintf('%UDP.sport%'))
+                flow_dport = find_port_number(flows[key][0].sprintf('%UDP.dport%'))
 
             # find avg packet size
             total_packet_size = 0
@@ -109,22 +129,47 @@ def extract_data():
                 total_packet_size += int(packet.sprintf('%IP.len%'))
             avg_packet_size = total_packet_size/flow_size
 
+            # gather values to go into csv
+            # *** a lot of this can be removed, just messing around for now ***
+            tempflow_id = flow_id
+            tempIPsrc = flows[key][0].sprintf('%IP.src%')
+            tempIPdst = flows[key][0].sprintf('%IP.dst%')
+            tempproto = protocol
+            temptime = flows[key][0].time
+            tempnum_packets = total_packet_size
+            tempsport = flow_sport
+            tempdport = flow_dport
+            tempavg_packet_size = avg_packet_size
+            templabel = label
+
             # output flow data to csv file
-            csv_row = '%d, %d, %d, %d, %d\n' % (flow_size, protocol, flow_sport, flow_dport, avg_packet_size)
+            #csv_row = '%d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n' % (tempflow_id, tempIPsrc, tempIPdst, tempproto,
+            #                                                        temptime, tempnum_packets, tempsport, tempdport,
+            #                                                        tempavg_packet_size, templabel)
+
+            csv_row = f'{tempflow_id}, {tempIPsrc}, {tempIPdst}, {tempproto}, ' \
+                      f'{temptime}, {tempnum_packets}, {tempsport}, {tempdport}, {tempavg_packet_size}, {templabel}\n'
+
             p.write(csv_row)
 
+            # increment counter id
+            flow_id += 1
 
 # *********************************
 # Start Program!
 # ********************************
-c = 1000  # variable for amount of packets to collect
+c = 20000  # variable for amount of packets to collect
 flows = {}  # dictionary to hold flows
+label = input("What activity are you preforming:\n [1] Web browsing\n "
+              "[2] Video Streaming (e.g. Youtube)\n [3] Video Conference (e.g. Skype)\n [4] File Download\n")
 
 packets = sniff(count=c)
 
 # Step 1: Extract all packets that belong to the same flow
 # tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
 find_flows()
+
+remove_flows() # remove noise
 
 # Step 2: Extract the interested value from each packet of the flow
 # and calculate a statistical measure (max, min, avg, std_dev...)
