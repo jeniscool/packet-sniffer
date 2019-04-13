@@ -83,6 +83,12 @@ def find_port_number(port):
         return 3480
     elif port == 'ssdp':
         return 1900
+    elif port == 'celatalk':
+        return 3485
+    elif port == 'ddi_udp_2':
+        return 8889
+    elif port == 'swr_port':
+        return 3491
     else:
         if type(port) == int:
             return port
@@ -90,7 +96,7 @@ def find_port_number(port):
             try:
                 return int(port)
             except ValueError:
-                print(f'cant find {port}')
+                print(f'ALERT: Cant find {port}')
                 return 0
 
 # *********************************************
