@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8de7d6f9-e56a-49c2-a563-9d12716fb39c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ML.py" beforeDir="false" afterPath="$PROJECT_DIR$/ML.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scapy-skeleton.py" beforeDir="false" afterPath="$PROJECT_DIR$/scapy-skeleton.py" afterDir="false" />
-    </list>
+    <list default="true" id="8de7d6f9-e56a-49c2-a563-9d12716fb39c" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,10 +31,18 @@
             <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
           </provider>
           <provider selected="true" editor-type-id="csv-text-editor">
-            <state relative-caret-position="-1115">
-              <caret line="234" lean-forward="true" selection-start-line="234" selection-end-line="234" />
+            <state relative-caret-position="5040">
+              <caret line="336" column="79" lean-forward="true" selection-start-line="336" selection-start-column="79" selection-end-line="336" selection-end-column="79" />
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/newdata1.csv">
+          <provider editor-type-id="csv-table-editor">
+            <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+          </provider>
+          <provider selected="true" editor-type-id="csv-text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -129,7 +132,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1554749340034</updated>
-      <workItem from="1555356396673" duration="7045000" />
+      <workItem from="1555356396673" duration="7269000" />
     </task>
     <task id="LOCAL-00001" summary="grouping packets wih same flow together">
       <created>1554947733039</created>
@@ -138,18 +141,18 @@
       <option name="project" value="LOCAL" />
       <updated>1554947733040</updated>
     </task>
-    <task id="LOCAL-00002" summary="parsing through packets">
-      <created>1554918172941</created>
+    <task id="LOCAL-00002" summary="new packets">
+      <created>1555363797491</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1554918172942</updated>
+      <updated>1555363797491</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12235000" />
+    <option name="totallyTimeSpent" value="12459000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -182,7 +185,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="grouping packets wih same flow together" />
-    <option name="LAST_COMMIT_MESSAGE" value="grouping packets wih same flow together" />
+    <MESSAGE value="new packets" />
+    <option name="LAST_COMMIT_MESSAGE" value="new packets" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/venv/bin/activate">
@@ -241,6 +245,12 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/newdata1.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/data.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
@@ -251,8 +261,8 @@
         </state>
       </provider>
       <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="-1115">
-          <caret line="234" lean-forward="true" selection-start-line="234" selection-end-line="234" />
+        <state relative-caret-position="5040">
+          <caret line="336" column="79" lean-forward="true" selection-start-line="336" selection-start-column="79" selection-end-line="336" selection-end-column="79" />
         </state>
       </provider>
     </entry>
