@@ -10,7 +10,7 @@ from sklearn.neural_network import  MLPClassifier
 
 
 
-df = pd.read_csv("data.csv", header=None)
+df = pd.read_csv("newdata1.csv", header=None)
 # You might not need this next line if you do not care about losing information about flow_id etc. All you actually need to
 # feed your machine learning model are features and output label.
 columns_list = ['flow_id', 'IPsrc', 'IPdst', 'proto', 'time', 'num_packets', 'sport', 'dport', 'avg_packet_size', 'label']
@@ -23,7 +23,7 @@ Labels = df['label']
 acc_scores = 0
 for i in range(0, 10):
     # Split the data set into training set and testing set
-    Features_train, Features_test, Labels_train, Labels_test = train_test_split(Features, Labels, test_size=0.5)
+    Features_train, Features_test, Labels_train, Labels_test = train_test_split(Features, Labels, test_size=0.75)
 
     #print(f'Features_train: \n{Features_train}\nFeatures_test: \n{Features_test}'
     #      f'\nLabels_train: \n{Labels_train}\nLabels_test: \n{Labels_test}')
