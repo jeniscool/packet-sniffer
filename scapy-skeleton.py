@@ -41,6 +41,7 @@ def find_flows():
             else:  # if not, create a new flow in dictionary
                 flows[flow_id] = [packet]
 
+
 # ***********************************
 # Function to remove noise from data
 # ***********************************
@@ -53,13 +54,14 @@ def remove_flows():
         # finds number of packets in each flow
         flow_size = len(flows[key])
         # if there's less that 10 flows delete
-        if flow_size > 10:
+        if flow_size < 10:
             selectedkeys.append(key)
 
     # delete selected keys from list of flows
     for key in selectedkeys:
         if key in flows.keys():
             del flows[key]
+
 
 # *********************************************
 # Function to return the port # for a service
@@ -96,8 +98,9 @@ def find_port_number(port):
             try:
                 return int(port)
             except ValueError:
-                print(f'ALERT: Cant find {port}')
+                # print(f'ALERT: Cant find {port}')
                 return 0
+
 
 # *********************************************
 # Function to extract data from flows into csv
@@ -105,9 +108,6 @@ def find_port_number(port):
 def extract_data():
     csv_file = 'data.csv'
     with open(csv_file, 'a') as p:
-        # write csv headers
-        #p.write(str('flow_id, IPsrc, IPdst, proto, time, num packets, sport, dport, avg_packet_size, label\n'))
-
         flow_id = 0
 
         # for each flow
@@ -135,26 +135,31 @@ def extract_data():
                 total_packet_size += int(packet.sprintf('%IP.len%'))
             avg_packet_size = total_packet_size/flow_size
 
+            # find elapsed time of flow
+            temp_list = flows.get(key)
+            list_of_times = []
+            for temp_packet in temp_list:
+                list_of_times.append(temp_packet.time)
+            list_of_times.sort()
+            max_time = list_of_times[-1]
+            min_time = list_of_times[0]
+            elapsed_time = max_time-min_time
+
             # gather values to go into csv
             # *** a lot of this can be removed, just messing around for now ***
             tempflow_id = flow_id
             tempIPsrc = flows[key][0].sprintf('%IP.src%')
             tempIPdst = flows[key][0].sprintf('%IP.dst%')
             tempproto = protocol
-            temptime = flows[key][0].time
-            tempnum_packets = total_packet_size
+            temptime = elapsed_time
+            tempnum_packets = flow_size
             tempsport = flow_sport
             tempdport = flow_dport
             tempavg_packet_size = avg_packet_size
             templabel = label
 
-            # output flow data to csv file
-            #csv_row = '%d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n' % (tempflow_id, tempIPsrc, tempIPdst, tempproto,
-            #                                                        temptime, tempnum_packets, tempsport, tempdport,
-            #                                                        tempavg_packet_size, templabel)
-
-            csv_row = f'{tempflow_id}, {tempIPsrc}, {tempIPdst}, {tempproto}, ' \
-                      f'{temptime}, {tempnum_packets}, {tempsport}, {tempdport}, {tempavg_packet_size}, {templabel}\n'
+            csv_row = f'{tempflow_id}, {tempIPsrc}, {tempIPdst}, {tempproto}, {temptime}, {tempnum_packets},' \
+                f' {tempsport}, {tempdport}, {tempavg_packet_size}, {templabel}\n'
 
             p.write(csv_row)
 
@@ -164,7 +169,7 @@ def extract_data():
 # *********************************
 # Start Program!
 # ********************************
-c = 20000  # variable for amount of packets to collect
+c = 12000  # variable for amount of packets to collect
 flows = {}  # dictionary to hold flows
 label = input("What activity are you preforming:\n [1] Web browsing\n "
               "[2] Video Streaming (e.g. Youtube)\n [3] Video Conference (e.g. Skype)\n [4] File Download\n")
