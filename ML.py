@@ -15,7 +15,8 @@ from sklearn.metrics import f1_score
 df = pd.read_csv("data/data.csv", header=None)
 write_file = 'test.csv'
 test_size = .25
-# You might not need this next line if you do not care about losing information about flow_id etc. All you actually need to
+# You might not need this next line if you do not care about losing information
+# about flow_id etc. All you actually need to
 # feed your machine learning model are features and output label.
 columns_list = ['flow_id', 'IPsrc', 'IPdst', 'proto', 'time', 'num_packets', 'sport', 'dport', 'avg_packet_size', 'label']
 df.columns = columns_list
@@ -31,7 +32,7 @@ acc_scores = 0
 for i in range(0, 10):
     # Split the data set into training set and testing set
 
-    Features_train, Features_test, Labels_train, Labels_test = train_test_split(Features, Labels, test_size= test_size)
+    Features_train, Features_test, Labels_train, Labels_test = train_test_split(Features, Labels, test_size=test_size)
 
     # Decision Trees
     dt = tree.DecisionTreeClassifier()
