@@ -30,18 +30,19 @@ with open(write_file, 'a') as w:
 acc_scores = 0
 for i in range(0, 10):
     # Split the data set into training set and testing set
+
     Features_train, Features_test, Labels_train, Labels_test = train_test_split(Features, Labels, test_size= test_size)
 
-    #Decision Trees
+    # Decision Trees
     dt = tree.DecisionTreeClassifier()
     dt.fit(Features_train, Labels_train)
     dt_predict = dt.predict(Features_test)
 
     dt_result = dt.score(Features_test, Labels_test)  # accuracy score
-    dt_precision = precision_score(Labels_test, dt_predict, average = 'micro') # precision score
-    dt_recall = recall_score(Labels_test, dt_predict, average = 'micro') # recall scoree
-    dt_f1 = f1_score(Labels_test, dt_predict, average = 'micro') # f1 score
 
+    dt_precision = precision_score(Labels_test, dt_predict, average='micro')  # precision score
+    dt_recall = recall_score(Labels_test, dt_predict, average='micro')  # recall score
+    dt_f1 = f1_score(Labels_test, dt_predict, average='micro')  # f1 score
 
     # Neural network (MultiPerceptron Classifier)
     nn = MLPClassifier()
@@ -53,9 +54,9 @@ for i in range(0, 10):
     nn_recall = recall_score(Labels_test, nn_predict, average='micro')  # recall score
     nn_f1 = f1_score(Labels_test, nn_predict, average='micro')  # f1 score
 
-    #SVM's
-    svm = SVC(gamma='auto')     #SVC USE THIS
-    svm = LinearSVC()  #Linear SVC
+    # SVMs
+    svm = SVC(gamma='auto')     # SVC USE THIS
+    # svm = LinearSVC()  #Linear SVC
     svm.fit(Features_train, Labels_train)
     svm_predict = svm.predict(Features_test)
 
