@@ -1,0 +1,41 @@
+Machine Learning Data, Accuracy, Precision, Recall, F1
+Iteration 0
+Decision Tree: , 0.8, 0.8, 0.8, 0.8000000000000002
+Neural Network: , 0.32, 0.32, 0.32, 0.32
+SVM: , 0.52, 0.52, 0.52, 0.52
+Iteration 1
+Decision Tree: , 0.84, 0.84, 0.84, 0.8399999999999999
+Neural Network: , 0.38, 0.38, 0.38, 0.38
+SVM: , 0.4, 0.4, 0.4, 0.4000000000000001
+Iteration 2
+Decision Tree: , 0.82, 0.82, 0.82, 0.82
+Neural Network: , 0.56, 0.56, 0.56, 0.56
+SVM: , 0.34, 0.34, 0.34, 0.34
+Iteration 3
+Decision Tree: , 0.76, 0.76, 0.76, 0.76
+Neural Network: , 0.6, 0.6, 0.6, 0.6
+SVM: , 0.46, 0.46, 0.46, 0.46
+Iteration 4
+Decision Tree: , 0.84, 0.84, 0.84, 0.8399999999999999
+Neural Network: , 0.16, 0.16, 0.16, 0.16
+SVM: , 0.32, 0.32, 0.32, 0.32
+Iteration 5
+Decision Tree: , 0.88, 0.88, 0.88, 0.88
+Neural Network: , 0.16, 0.16, 0.16, 0.16
+SVM: , 0.38, 0.38, 0.38, 0.38
+Iteration 6
+Decision Tree: , 0.84, 0.84, 0.84, 0.8399999999999999
+Neural Network: , 0.4, 0.4, 0.4, 0.4000000000000001
+SVM: , 0.2, 0.2, 0.2, 0.20000000000000004
+Iteration 7
+Decision Tree: , 0.8, 0.8, 0.8, 0.8000000000000002
+Neural Network: , 0.34, 0.34, 0.34, 0.34
+SVM: , 0.38, 0.38, 0.38, 0.38
+Iteration 8
+Decision Tree: , 0.68, 0.68, 0.68, 0.68
+Neural Network: , 0.2, 0.2, 0.2, 0.20000000000000004
+SVM: , 0.48, 0.48, 0.48, 0.48
+Iteration 9
+Decision Tree: , 0.78, 0.78, 0.78, 0.78
+Neural Network: , 0.34, 0.34, 0.34, 0.34
+SVM: , 0.48, 0.48, 0.48, 0.48
