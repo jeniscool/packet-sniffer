@@ -13,7 +13,7 @@ from sklearn.metrics import f1_score
 
 
 df = pd.read_csv("data/data.csv", header=None)
-write_file = 'ML.csv'
+write_file = 'test.csv'
 test_size = .25
 # You might not need this next line if you do not care about losing information about flow_id etc. All you actually need to
 # feed your machine learning model are features and output label.
@@ -25,7 +25,7 @@ Features = df[features]
 Labels = df['label']
 
 with open(write_file, 'a') as w:
-    w.write('Machine Learning Data, Accuracy, Precision, Recall, F1')
+    w.write('Machine Learning Data, , ,Accuracy, Precision, Recall, F1\n')
 
 acc_scores = 0
 for i in range(0, 10):
@@ -66,7 +66,7 @@ for i in range(0, 10):
     svm_f1 = f1_score(Labels_test, svm_predict, average='micro')  # f1 score
 
     with open(write_file, 'a') as w:
-        w.write(f'\nIteration {i}, test_size = {test_size}, ')
+        w.write(f'Iteration {i}, test_size = {test_size}, ')
         w.write(f',Decision Tree: , {dt_result}, {dt_precision}, {dt_recall}, {dt_f1}, ')
         w.write(f',Neural Network: , {nn_result}, {nn_precision}, {nn_recall}, {nn_f1}, ')
-        w.write(f',SVM: , {svm_result}, {svm_precision}, {svm_recall}, {svm_f1}, ')
+        w.write(f',SVM: , {svm_result}, {svm_precision}, {svm_recall}, {svm_f1}, \n')
