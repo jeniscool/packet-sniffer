@@ -7,12 +7,14 @@ from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 from sklearn import tree
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
 
 
-
-df = pd.read_csv("data.csv", header=None)
+df = pd.read_csv("data/data.csv", header=None)
 write_file = 'ML.csv'
+test_size = .25
 # You might not need this next line if you do not care about losing information about flow_id etc. All you actually need to
 # feed your machine learning model are features and output label.
 columns_list = ['flow_id', 'IPsrc', 'IPdst', 'proto', 'time', 'num_packets', 'sport', 'dport', 'avg_packet_size', 'label']
@@ -28,7 +30,7 @@ with open(write_file, 'a') as w:
 acc_scores = 0
 for i in range(0, 10):
     # Split the data set into training set and testing set
-    Features_train, Features_test, Labels_train, Labels_test = train_test_split(Features, Labels, test_size=0.25)
+    Features_train, Features_test, Labels_train, Labels_test = train_test_split(Features, Labels, test_size= test_size)
 
     #Decision Trees
     dt = tree.DecisionTreeClassifier()
@@ -37,7 +39,7 @@ for i in range(0, 10):
 
     dt_result = dt.score(Features_test, Labels_test)  # accuracy score
     dt_precision = precision_score(Labels_test, dt_predict, average = 'micro') # precision score
-    dt_recall = recall_score(Labels_test, dt_predict, average = 'micro') # recall score
+    dt_recall = recall_score(Labels_test, dt_predict, average = 'micro') # recall scoree
     dt_f1 = f1_score(Labels_test, dt_predict, average = 'micro') # f1 score
 
 
@@ -63,7 +65,7 @@ for i in range(0, 10):
     svm_f1 = f1_score(Labels_test, svm_predict, average='micro')  # f1 score
 
     with open(write_file, 'a') as w:
-        w.write(f'\nIteration {i}\n')
-        w.write(f'Decision Tree: , {dt_result}, {dt_precision}, {dt_recall}, {dt_f1}\n')
-        w.write(f'Neural Network: , {nn_result}, {nn_precision}, {nn_recall}, {nn_f1}\n')
-        w.write(f'SVM: , {svm_result}, {svm_precision}, {svm_recall}, {svm_f1}')
+        w.write(f'\nIteration {i}, test_size = {test_size}, ')
+        w.write(f',Decision Tree: , {dt_result}, {dt_precision}, {dt_recall}, {dt_f1}, ')
+        w.write(f',Neural Network: , {nn_result}, {nn_precision}, {nn_recall}, {nn_f1}, ')
+        w.write(f',SVM: , {svm_result}, {svm_precision}, {svm_recall}, {svm_f1}, ')
