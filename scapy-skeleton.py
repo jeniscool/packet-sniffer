@@ -166,6 +166,7 @@ def extract_data():
             # increment counter id
             flow_id += 1
 
+
 # *********************************
 # Start Program!
 # ********************************
@@ -180,7 +181,7 @@ packets = sniff(count=c)
 # tuple consisting of: [srcIP addr, srcport, destIP addr, destport, tranproto]
 find_flows()
 
-remove_flows() # remove noise
+remove_flows()  # remove noise
 
 # Step 2: Extract the interested value from each packet of the flow
 # and calculate a statistical measure (max, min, avg, std_dev...)
